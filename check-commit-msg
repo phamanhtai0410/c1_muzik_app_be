@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+import re
+import sys
+from subprocess import check_output
+
+colors = {
+    "SUCCESS": "\033[92m",
+    "INFO": "\033[94m",
+    "WARNING": "\033[93m",
+    "ERROR": "\033[91m",
+    "BOLD": "\033[1m",
+    "ENDC": "\033[0m",
+    "DEFAULT": "",
+}
+
+
+class ColorPrint:
+    def color_print(self, message, level="DEFAULT", bold=False, **kwargs):
+        bold_color = colors["BOLD"] if bold else ""
+        print(
+            bold_color + colors[level] + message + colors["ENDC"],
+            end=kwargs.get("end", "\n"),
+        )
+
+    def invalid_message_template(self):
+        self.color_print(
+            "\nERROR Commit message has invalid template.\n", "ERROR", True
+        )
+        self.color_print("Please use next template:\n")
+        self.color_print("   [Prefix] commit message\n", bold=True)
+        msg = "Examples:\n"
+        msg += "    - [NBA-29] add custom models managers\n"
+        msg += "    - [hotfix] fix typos \n"
+        self.color_print(msg)
+
+    def invalid_prefix(self, branch, prefix):
+        self.color_print(
+            "\n WARNING Verify your commit message prefix.\n",
+            "WARNING",
+            True,
+        )
+        self.color_print("You use branch ", end="")
+        self.color_print("{}".format(branch), "INFO", end="")
+        self.color_print(", but your commit prefix is ", end="")
+        self.color_print("{}".format(prefix), "INFO")
+        self.color_print("")
+
+    def success_commit(self):
+        self.color_print("Success committed\n", "SUCCESS")
+
+
+class CommitMessageValidate:
+    def __init__(self):
+        self.branch = self.get_current_branch()
+        self.commit_msg = self.get_commit_msg()
+        self.color_print = ColorPrint()
+
+    def get_current_branch(self):
+        return str(
+            check_output(["git", "symbolic-ref", "--short", "HEAD"])
+            .decode("utf-8")
+            .strip()
+        )
+
+    def get_commit_msg(self):
+        commit_msg_filepath = sys.argv[1]
+        with open(commit_msg_filepath, "r+") as f:
+            return f.read()
+
+    def branch_name_is_jira_task(self):
+        regex = r"^[A-Z]{1,9}-[0-9]{1,9}"
+        return bool(re.match(regex, self.branch))
+
+    def msg_template_is_valid(self):
+        regex = r"\[(.*?)\]+\s+\S"
+        return bool(re.match(regex, self.commit_msg))
+
+    def check_prefix_validation(self):
+        if not self.branch_name_is_jira_task():
+            return
+        prefix = "[{branch}]".format(branch=self.branch)
+        if not self.commit_msg.startswith(prefix):
+            current_prefix = re.match(r"\[(.*?)\]", self.commit_msg).group(0)[1:-1]
+            self.color_print.invalid_prefix(self.branch, current_prefix)
+
+
+if __name__ == "__main__":
+    color_print = ColorPrint()
+    validator = CommitMessageValidate()
+    if not validator.msg_template_is_valid():
+        color_print.invalid_message_template()
+        sys.exit(1)
+    validator.check_prefix_validation()
+    color_print.success_commit()

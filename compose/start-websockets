@@ -1,0 +1,6 @@
+#!/bin/bash
+source .env
+
+if [ $USE_WS = "True" ]; then
+    watchmedo auto-restart --pattern "*.py" --recursive --signal SIGTERM python src/websockets/server.py
+fi

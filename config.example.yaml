@@ -1,0 +1,171 @@
+DEBUG: true
+SECRET_KEY: 'Django secret key'
+
+MORALIS_API_KEY: ""
+MORALIS_TRANSFER_URL: "https://deep-index.moralis.io/api/v2/nft/{address}/transfers?chain={chain_name}&format=decimal&limit=1"
+ETHERSCAN_URL: "https://{api-domain}/api?module=account&action={action}&address={address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey={key}"
+
+
+ALLOWED_HOSTS: 
+  - 'localhost'
+
+IPFS_CLIENT: 'IPFS client address'
+IPFS_PORT: 5001
+
+# SCANNER
+SCANNER_SLEEP: 10
+
+USER_URL_FIELD: 'custom_url'
+SORT_STATUSES:
+    recent: '-created_at'
+    cheapest: 'price'
+    highest: '-price'
+
+SEARCH_TYPES:
+    items: token
+    users: user
+    collections: collection
+
+SIGNER_ADDRESS: ''
+CAPTCHA_SECRET: ''
+CAPTCHA_URL: ''
+PRIV_KEY: '' #Signer private key
+IPFS_DOMAIN: ''
+BOTS:
+  DEV:
+    TOKEN: ''
+    GROUP_ID: ''
+  TRADE:
+    TOKEN: ''
+    GROUP_ID: ''
+
+TX_TRACKER_TIMEOUT: 300
+RATES_CHECKER_TIMEOUT: 300
+CLEAR_TOKEN_TAG_NEW_TIME: 5
+
+TRENDING_TRACKER_TIME: 7 # days
+
+API_URL: "https://api.coingecko.com/api/v3/coins/{coin_code}"
+
+TITLE: 'Project name'
+DESCRIPTION: 'Project description'
+ITEMS_PER_PAGE: 50 # Default items count on page for pagination
+MAX_ROYALTY_PERCENTAGE: 99.9
+
+DEFAULT_NETWORK: ethereum
+
+#Initial DB fixtures:
+NETWORKS:
+  - name: Ethereum #3
+    needs_middleware: false
+    native_symbol: ETH
+    chain_id: 2
+    fabric721_address: "0x111222233333444455556666777788889999"
+    fabric1155_address: "0x111222233333444455556666777788889999"
+    exchange_address: "0x111222233333444455556666777788889999"
+    promotion_address: "0x7c9d846A96845be646120F6B45951Bb3C3177da3"
+    platform_fee_percentage: 10
+    platform_fee_address: "0x5a4B4454EDC88325FA1f88A8D9016E8b6eB3BEC5"
+    network_type: Ethereum
+    deadline: 30
+
+PROVIDERS:
+  - endpoint: "RPC endpoint"
+    network: ethereum 
+
+EMAILS:
+  - role: receiver
+    address: ''
+  - role: sender
+    address: ''
+    password: ''
+    smtp: ''
+    port: 587
+    use_tls: true
+
+USD_RATES:
+  - coin_node: ethereum
+    symbol: weth
+    name: Wrapped Ethereum
+    image: "image url"
+    address: "0x111222233333444455556666777788889999"
+    decimal: 18
+    network: ethereum
+
+#Celery tasks:
+INTERVALS:
+  - every: 2
+    period: MINUTES
+    pk: 1
+  - every: 1
+    period: HOURS
+    pk: 2
+  - every: 5
+    period: MINUTES
+    pk: 3
+
+CRONTABS:
+  - hour: 0
+    minute: 0
+    pk: 1
+
+
+PERIODIC_TASKS:
+  - name: remove_pending
+    task: remove_pending
+    interval: 2
+    enabled: true
+  - name: incorrect_bid_checker
+    task: incorrect_bid_checker
+    interval: 1
+    enabled: true
+  - name: update_top_users
+    task: update_top_users
+    interval: 2
+    enabled: true
+  - name: update_collections_stat_info
+    task: update_collection_stat_info
+    interval: 3
+    enabled: false
+  - name: rates_checker
+    task: rates_checker
+    interval: 3
+    enabled: true
+  - name: transaction_tracker
+    task: transaction_tracker
+    interval: 3
+    enabled: true
+  - name: balance_checker
+    task: balance_checker
+    interval: 3
+    enabled: true
+  - name: end_auction_checker
+    task: end_auction_checker
+    interval: 3
+    enabled: true
+  - name: promotion_checker
+    task: promotion_checker
+    interval: 3
+    enabled: true
+  - name: parse_metadata_starter
+    task: parse_metadata_starter
+    interval: 3
+    enabled: true
+  - name: calculate_rarity_starter
+    task: calculate_rarity_starter
+    interval: 3
+    enabled: true
+  - name: clear_import_requests
+    task: clear_import_requests
+    crontab: 1
+    enabled: true
+
+REDIS_HOST: 'test-redis'
+REDIS_PORT: 6379
+REDIS_EXPIRATION_TIME: 86400 # day in seconds
+
+SENTRY_DSN: ''
+PENDING_EXPIRATION_MINUTES: 300
+NOTIFICATION_COUNT: 5
+WS_TOKEN_AGE_SECONDS: 30
+INCLUDE_FOLLOWING_NOTIFICATIONS: true

@@ -1,0 +1,23 @@
+repos:
+- repo: local
+  hooks:
+    - id: check-commit-msg
+      name: check-commit-msg
+      entry: ./check-commit-msg
+      stages: [prepare-commit-msg]
+      language: python 
+      verbose: true
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.9.3
+    hooks:
+    -   id: isort
+        args: ["--profile", "black"]
+-   repo: https://github.com/psf/black
+    rev: 21.8b0
+    hooks:
+    -   id: black 
+        additional_dependencies: ['click==8.0.4']
+-   repo: https://github.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+    -   id: flake8

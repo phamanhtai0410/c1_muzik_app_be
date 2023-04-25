@@ -1,0 +1,19 @@
+services:
+  test-db:
+    image: postgres:14.0
+    env_file:
+      - compose/test/.test-env
+  test-web:
+    build:
+      context: .
+      dockerfile: compose/test/Dockerfile
+    env_file:
+      - compose/test/.test-env
+    environment:
+      - IS_TEST=1
+    depends_on:
+      - test-db
+      - test-redis
+    command: /start
+  test-redis:
+    image: redis:5.0

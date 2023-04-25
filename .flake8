@@ -1,0 +1,13 @@
+[flake8]
+exclude = .git, __pycache__, apps.py, test*, *test.py, *management/commands
+ignore = 
+    E251,
+    E501,
+    E402,
+    W291,
+    W293,
+    W503,
+    F405,
+    E128,
+    E122,
+    E126,

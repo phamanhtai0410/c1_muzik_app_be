@@ -1,0 +1,91 @@
+services:
+  db:
+    image: postgres:14.0
+    command: postgres -c 'max_connections=500'
+    env_file:
+      - ./.env
+    volumes:
+      - ./.docker/postgres-data:/var/lib/postgresql/data
+    networks:
+      nft-net:
+  web: &web
+    build:
+      context: .
+      dockerfile: compose/dev/Dockerfile
+    env_file:
+      - ./.env
+    ports:
+      - "${DOCKER_EXPOSE_PORT?8000}:8000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./src/:/code/src/
+      - ./static/:/code/static/
+      - ./logs:/code/logs/
+      - ./media:/code/media/
+    command: /start
+    restart: unless-stopped
+    networks:
+      nft-net:
+      dev-ipfs:
+ # ipfs:
+   # image: ipfs/go-ipfs:v0.11.0
+   # ports:
+    #  - 4002:4001/tcp
+    #  - 4002:4001/udp
+    #  - 5002:5001
+   # volumes:
+   #   - ./.docker/ipfs:/data/ipfs
+   # environment:
+   #   - IPFS_PATH=/data/ipfs
+   # restart: unless-stopped
+   # networks:
+   #    nft-net:
+  scanner:
+    <<: *web
+    depends_on:
+      - db
+      - redis
+    command: /start-scanner
+    ports: []
+  redis:
+    image: redis:5.0
+    restart: unless-stopped 
+    volumes:
+      - ./.docker/redis-data:/data
+    networks:
+      nft-net:
+  celery:
+    <<: *web
+    image: celery:3.1
+    command: /start-celery
+    depends_on:
+      - redis
+    ports: []
+  celery_beat:
+    <<: *web
+    image: celery:3.1
+    command: /start-celerybeat
+    depends_on:
+      - redis
+    ports: []
+  bot:
+    <<: *web
+    depends_on:
+      - db
+    command: python start_bot_polling.py
+    ports: []
+  websockets:
+    <<: *web
+    depends_on:
+      - db
+      - redis
+      - web
+    command: /start-websockets
+    ports:
+      - "${DOCKER_WS_EXPOSE_PORT?8001}:8001"
+networks:
+  nft-net:
+  dev-ipfs:
+    external: True

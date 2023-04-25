@@ -1,0 +1,21 @@
+{% if sections %}
+<div id="extra_links_wrapper" class="module">
+    <table>
+        <caption>
+            <a class="section" title="Guidelines">Guidelines</a>
+        </caption>
+        {% for section in sections %}
+        <tr>
+            <th scope="row">
+                <a href="{% url section.admin_url %}">
+                    {{section.name}}
+                </a>
+            </th>
+            <td></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+{% include 'admin/app_list.html' %}

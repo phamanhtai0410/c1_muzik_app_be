@@ -1,0 +1,13 @@
+.idea
+.git
+
+**/__pycache__
+**/*.pyc
+
+venv
+.venv
+
+Dockerfile
+docker-compose.yml
+/.docker
+logs/
